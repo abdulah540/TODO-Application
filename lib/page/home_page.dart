@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo/utilities/dialog_box.dart';
 import 'package:todo/utilities/todo_tile.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,6 +10,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  final _controller = TextEditingController();
 
   List todoList = [
   ["Make Tutorial", false],
@@ -23,6 +26,25 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  //create a new task
+  // ignore: non_constant_identifier_names
+  void CreateNewTask(){
+    showDialog(context: context, builder: (context){
+      return DialogBox(
+        controller: _controller,
+        onsave: saveNewTask,
+        oncancel: () => Navigator.of(context).pop(),
+      );
+    });
+  }
+
+  void saveNewTask(){
+    setState(() {
+      todoList.add([_controller.text, false]);
+      _controller.clear();
+    });
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +53,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("To Do"),
         elevation: 0,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: CreateNewTask,
+        child: Icon(Icons.add),
       ),
       body: ListView.builder(
         itemCount: todoList.length,

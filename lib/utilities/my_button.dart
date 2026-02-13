@@ -1,0 +1,20 @@
+// ignore_for_file: sort_child_properties_last
+
+import 'package:flutter/material.dart';
+
+// ignore: must_be_immutable
+class MyButton extends StatelessWidget {
+  final String text;
+  VoidCallback onPressed;
+
+  MyButton({super.key, required this.text, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      onPressed: onPressed,
+      child: Text(text),
+      color: Theme.of(context).primaryColor,
+    );
+  }
+}
