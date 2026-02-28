@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:todo/utilities/my_button.dart';
 
 class DialogBox extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onsave;
+  final VoidCallback oncancel;
 
-  final controller ;
-  VoidCallback onsave;
-  VoidCallback oncancel;
-
-  DialogBox({super.key,
-  required this.controller,
-  required this.onsave,
-  required this.oncancel});
+  const DialogBox({
+    super.key,
+    required this.controller,
+    required this.onsave,
+    required this.oncancel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +36,11 @@ class DialogBox extends StatelessWidget {
               children: [
                 //save button
                 MyButton(text: "Save", onPressed: onsave),
-                const SizedBox(width: 8,),
+                const SizedBox(width: 8),
                 //cancel button
                 MyButton(text: "Cancel", onPressed: oncancel),
               ],
-            )
+            ),
           ],
         ),
       ),

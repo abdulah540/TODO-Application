@@ -10,35 +10,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   final _controller = TextEditingController();
 
-  List todoList = [
-  ["Make Tutorial", false],
-  ["Do Exercise", false],
-  ["Play Game", false],
-];
+  List<List<dynamic>> todoList = [];
 
   //checkbox was tapped
-  void CheckBoxChanged(bool? value,int index){
+  void checkBoxChanged(bool? value, int index) {
     setState(() {
-      todoList[index][1]=!todoList[index][1];
+      todoList[index][1] = !todoList[index][1];
+    });
+  }
+
+  //delete a task
+  void deleteTask(int index) {
+    setState(() {
+      todoList.removeAt(index);
     });
   }
 
   //create a new task
-  // ignore: non_constant_identifier_names
-  void CreateNewTask(){
-    showDialog(context: context, builder: (context){
-      return DialogBox(
-        controller: _controller,
-        onsave: saveNewTask,
-        oncancel: () => Navigator.of(context).pop(),
-      );
-    });
+  void createNewTask() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return DialogBox(
+          controller: _controller,
+          onsave: saveNewTask,
+          oncancel: () => Navigator.of(context).pop(),
+        );
+      },
+    );
   }
 
-  void saveNewTask(){
+  void saveNewTask() {
     setState(() {
       todoList.add([_controller.text, false]);
       _controller.clear();
@@ -50,21 +54,40 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.yellow[200],
-      appBar: AppBar(
-        title: Text("To Do"),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text("To Do"), elevation: 0),
       floatingActionButton: FloatingActionButton(
-        onPressed: CreateNewTask,
+        onPressed: createNewTask,
         child: Icon(Icons.add),
       ),
       body: ListView.builder(
         itemCount: todoList.length,
-        itemBuilder: (context, index){
-          return ToDoTile(
-            taskName: todoList[index][0],
-            taskCompleted: todoList[index][1],
-            onChanged: (value) => CheckBoxChanged(value, index),
+        itemBuilder: (context, index) {
+          return Dismissible(
+            key: Key(todoList[index][0]),
+            direction: DismissDirection.endToStart,
+            onDismissed: (direction) {
+              deleteTask(index);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Task deleted'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            background: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.centerRight,
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            child: ToDoTile(
+              taskName: todoList[index][0],
+              taskCompleted: todoList[index][1],
+              onChanged: (value) => checkBoxChanged(value, index),
+            ),
           );
         },
       ),

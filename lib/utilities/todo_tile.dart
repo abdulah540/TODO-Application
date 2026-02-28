@@ -2,16 +2,13 @@
 
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
-class  ToDoTile extends StatelessWidget {
-
+class ToDoTile extends StatelessWidget {
   final String taskName;
   final bool taskCompleted;
-  Function(bool?)? onChanged;
+  final Function(bool?)? onChanged;
 
-
-
-    ToDoTile({super.key,
+  const ToDoTile({
+    super.key,
     required this.taskName,
     required this.taskCompleted,
     required this.onChanged,
@@ -31,11 +28,15 @@ class  ToDoTile extends StatelessWidget {
               value: taskCompleted,
               onChanged: onChanged,
               activeColor: Colors.black,
-              ),
+            ),
             //task name
             Text(
               taskName,
-              style: TextStyle(decoration: taskCompleted ? TextDecoration.lineThrough : TextDecoration.none),
+              style: TextStyle(
+                decoration: taskCompleted
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
+              ),
             ),
           ],
         ),
