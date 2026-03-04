@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo/utilities/dialog_box.dart';
 import 'package:todo/utilities/todo_tile.dart';
+import 'package:todo/data/database.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,22 +12,43 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //reference the hive box
+  final _myBox = Hive.box("mybox");
+
   final _controller = TextEditingController();
 
-  List<List<dynamic>> todoList = [];
+  ToDoDatabase db = ToDoDatabase();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    //if this is the first time ever opening the app, then create default data
+    if (_myBox.get("TODOLIST") == null) {
+      db.createInitialData();
+    } else {
+      //there already exists data, so load it
+      db.loadData();
+    }
+
+    super.initState();
+  }
 
   //checkbox was tapped
   void checkBoxChanged(bool? value, int index) {
     setState(() {
-      todoList[index][1] = !todoList[index][1];
+      db.todoList[index][1] = !db.todoList[index][1];
     });
+    // persist the change
+    db.updateDatabase();
   }
 
   //delete a task
   void deleteTask(int index) {
     setState(() {
-      todoList.removeAt(index);
+      db.todoList.removeAt(index);
     });
+    db.updateDatabase();
   }
 
   //create a new task
@@ -44,9 +67,10 @@ class _HomePageState extends State<HomePage> {
 
   void saveNewTask() {
     setState(() {
-      todoList.add([_controller.text, false]);
+      db.todoList.add([_controller.text, false]);
       _controller.clear();
     });
+    db.updateDatabase();
     Navigator.of(context).pop();
   }
 
@@ -60,10 +84,10 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
       body: ListView.builder(
-        itemCount: todoList.length,
+        itemCount: db.todoList.length,
         itemBuilder: (context, index) {
           return Dismissible(
-            key: Key(todoList[index][0]),
+            key: Key(db.todoList[index][0]),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) {
               deleteTask(index);
@@ -84,8 +108,8 @@ class _HomePageState extends State<HomePage> {
               child: const Icon(Icons.delete, color: Colors.white),
             ),
             child: ToDoTile(
-              taskName: todoList[index][0],
-              taskCompleted: todoList[index][1],
+              taskName: db.todoList[index][0],
+              taskCompleted: db.todoList[index][1],
               onChanged: (value) => checkBoxChanged(value, index),
             ),
           );
